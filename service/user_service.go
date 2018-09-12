@@ -18,10 +18,24 @@ func NewUserRepository(db *sql.DB) repository.UserRepository {
 func (this *userService) FindByEmail(email string) (error, *model.Users) {
 	m := new(model.Users)
 
-	query := "SELECT id, name, email FROM users WHERE email=?"
+	query := "SELECT id, name, email, password FROM users WHERE email=?"
 	row := this.db.QueryRow(query, email)
-	err := row.Scan(&m.ID, &m.Name, &m.Email)
+	err := row.Scan(&m.ID, &m.Name, &m.Email, &m.Password)
 
+	if err != nil {
+		return err, nil
+	}
+
+	return nil, m
+}
+
+func (this userService) FindByID(ID int) (error, *model.Users) {
+	m := new(model.Users)
+
+	query := "SELECT * FROM users WHERE id = ?"
+	row := this.db.QueryRow(query, ID)
+
+	err := row.Scan(&m.ID, &m.Name, &m.Email, &m.Password, &m.RememberToken, &m.CreatedAt, &m.UpdatedAt)
 	if err != nil {
 		return err, nil
 	}
