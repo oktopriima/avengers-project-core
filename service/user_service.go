@@ -42,3 +42,22 @@ func (this userService) FindByID(ID int) (error, *model.Users) {
 
 	return nil, m
 }
+
+func (this userService) Register(m model.Users) error {
+	query := "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
+	stmt, err := this.db.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(m.Name, m.Email, m.Password)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
