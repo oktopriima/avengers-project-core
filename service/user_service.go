@@ -5,6 +5,7 @@ import (
 
 	"github.com/oktopriima/avengers-project-core/model"
 	"github.com/oktopriima/avengers-project-core/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userService struct {
@@ -44,6 +45,12 @@ func (this userService) FindByID(ID int) (error, *model.Users) {
 }
 
 func (this userService) Register(m model.Users) error {
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(m.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return err
+	}
+
 	query := "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
 	stmt, err := this.db.Prepare(query)
 
@@ -53,7 +60,7 @@ func (this userService) Register(m model.Users) error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(m.Name, m.Email, m.Password)
+	_, err = stmt.Exec(m.Name, m.Email, hashPass)
 
 	if err != nil {
 		return err
